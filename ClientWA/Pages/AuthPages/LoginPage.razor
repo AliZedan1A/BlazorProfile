@@ -1,0 +1,90 @@
+﻿@page "/login"
+@inject IApiService _apiservice
+@inject NavigationManager nav
+
+<AuthValidation Redirect="/" AuthV=false>
+
+</AuthValidation>
+<h3>Admin Login</h3>
+
+<div class="row">
+    <div class="col-md-4">
+        <section>
+            <div class="loginform" id="account">
+                <hr />
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating m-lg-3">
+                    <input @bind="UsernameInput" class="form-control" autocomplete="username" aria-required="true" />
+                    <label class="form-label">username</label>
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-floating m-lg-3">
+                    <input @bind="PasswordInput" asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                    <label asp-for="Input.Password" class="form-label">password</label>
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <label style="color:@TextColor ;visibility:@visibility">@Text</label>
+
+                <div>
+                    <button id="login-submit" @onclick="loginauth" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                </div>
+                <div>
+                    <button id="login-submit" @onclick="test" type="submit" class="w-100 btn btn-lg btn-primary">Test</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+</div>
+
+@code {
+    private string UsernameInput;
+    private string PasswordInput;
+
+    //lable
+    private string visibility = "hidden";
+    private string Text = string.Empty;
+    private string TextColor = "white";
+
+    private async void loginauth(MouseEventArgs e)
+    {
+        if (!string.IsNullOrEmpty(UsernameInput) && !string.IsNullOrEmpty(PasswordInput))
+        {
+
+            visibility = "hidden";
+            Text = string.Empty;
+            var response = await _apiservice.Auth(new Domain.DTO.AuthDto() { Username = UsernameInput, Password = PasswordInput });
+            if (response.IsSucceeded)
+            {
+                visibility = "visible";
+                Text = "تم تسجيل الدخول بنجاح";
+                TextColor = "green";
+                StateHasChanged();
+                nav.Refresh();
+
+            }
+            else
+            {
+                visibility = "visible";
+                Text = response.Comment;
+                TextColor = "red";
+                StateHasChanged();
+
+            }
+        }
+        else
+        {
+            visibility = "visible";
+            Text = "يرجى ادخال جميع المدخلات";
+            TextColor = "red";
+            StateHasChanged();
+
+
+        }
+    }
+    private async Task test(MouseEventArgs e)
+    {
+        var response = await _apiservice.refresh();
+        Console.WriteLine(response.Comment);
+    }
+}

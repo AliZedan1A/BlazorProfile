@@ -1,0 +1,62 @@
+﻿@using Newtonsoft.Json
+@inject Auth auth
+@inject NavigationManager nav
+    @if (IsVisible)
+    {
+        @ChildContent
+    }
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter, EditorRequired] public bool AuthV { get; set; }
+    [Parameter] public string? Role { get; set; } = "USER";
+    [Parameter] public string Redirect { get; set; }=string.Empty;
+
+    private bool IsVisible = true;
+    protected override async Task OnInitializedAsync()
+    {
+        var gust = await auth.GetAuthenticationAsync();
+        Console.WriteLine(JsonConvert.SerializeObject(gust));
+        if (AuthV)
+        {
+            if (gust != null)
+            {
+                if (Role != "USER" && gust.Role==Role)
+                {
+                    IsVisible = true;
+
+                }
+                else if(Role =="USER")
+                {
+                    IsVisible = true ;
+
+
+                }
+                else
+                {
+                    if (Redirect!=string.Empty) nav.NavigateTo(Redirect, false);
+                    IsVisible = false;
+                }
+            }
+            else
+            {
+                if (Redirect != string.Empty) nav.NavigateTo(Redirect, false);
+                IsVisible = false;
+            }
+        }
+        else
+        {
+            if (gust == null)
+            {
+                IsVisible = true;
+
+            }
+            else
+            {
+                if (Redirect != string.Empty) nav.NavigateTo(Redirect, false);
+                IsVisible = false;
+            }
+        }
+
+       
+    }
+}

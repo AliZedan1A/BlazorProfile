@@ -1,0 +1,29 @@
+﻿@page "/"
+@inject Auth auth
+
+<PageTitle>Home</PageTitle>
+<h1>Hello, world!</h1>
+<h1>
+</h1>
+<AuthValidation  AuthV=true Role="ADMIN">
+    <h1>
+        You Auth and your Role *ADMIN*
+    </h1>
+
+</AuthValidation>
+<AuthValidation AuthV=true>
+    <h1>
+        You Auth and you just user
+    </h1>
+
+</AuthValidation>
+<AuthValidation AuthV=false>
+    <h1>
+        You Not Auth
+    </h1>
+
+</AuthValidation>
+Welcome to your new app.
+@code{
+  
+}
