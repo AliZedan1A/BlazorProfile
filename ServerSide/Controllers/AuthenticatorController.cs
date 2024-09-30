@@ -19,6 +19,22 @@ namespace ServerSide.Controllers
             this._authservice = authservice;
             this.jwtService = jwtService;
         }
+        [HttpGet("RemoveToken")]
+        public IActionResult RemoveToken()
+        {
+            string x = string.Empty;
+            var IsFound =  HttpContext.Request.Cookies.TryGetValue("RefreshToken", out x);
+            if(IsFound)
+            {
+                HttpContext.Response.Cookies.Delete("RefreshToken");
+                _authservice.RemoveRefreshToken(x);
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Cookies Not Defined");
+            }
+        }
         [HttpGet("RefreshToken")]
         public IActionResult RefreshToken()
         {

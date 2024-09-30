@@ -1,4 +1,6 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@inject Auth auth
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">ClientWA</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -24,22 +26,38 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
             </NavLink>
         </div>
-         <AuthValidation AuthV=false>
-             <div class="nav-item px-3">
-            <NavLink class="nav-link" href="login">
+        @if(IsAuth == false)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="login">
                     <span class="bi bi-people" aria-hidden="true"></span> Login Panel
-            </NavLink>
-        </div>
-        </AuthValidation> 
+                </NavLink>
+            </div>
+        }
+
        
     </nav>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
+    private bool? IsAuth = null;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    protected override async Task OnInitializedAsync()
+    {
+        var gust = await auth.GetAuthenticationAsync();
+        if (gust .IsSucceeded)
+        {
+            IsAuth = true;
+        }
+        else
+        {
+            IsAuth =false;
+        }
+        StateHasChanged();
 
+    }
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;

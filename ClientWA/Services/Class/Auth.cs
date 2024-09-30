@@ -2,6 +2,7 @@
 using ClientWA.Services.Interfaces;
 using Domain.DTO;
 using Domain.Models;
+using Domain.ReturnsModels;
 
 namespace ClientWA.Services.Class
 {
@@ -16,16 +17,14 @@ namespace ClientWA.Services.Class
             _apiservice = apiservice;
         }
 
-        public  async Task<JWTDataModel> GetAuthenticationAsync()
+        public  async Task<ServiceReturnModel<JWTDataModel>> GetAuthenticationAsync()
         {
-
             var jwt = await localStorage.GetItemAsStringAsync("jwt");
             var expirestime = await localStorage.GetItemAsync<DateTime>("ExpiresTime");
             var data = await localStorage.GetItemAsync<JWTDataModel>("data");
-
             if (jwt != null&& data!=null&& expirestime> DateTime.UtcNow)
             {
-                 return data;
+                 return new ServiceReturnModel<JWTDataModel> { Comment = "suc",IsSucceeded = true  ,Value = data};
             }
             else
             {
@@ -37,7 +36,7 @@ namespace ClientWA.Services.Class
                 }
                 else
                 {
-                    return null;
+                    return new ServiceReturnModel<JWTDataModel> { Comment = "faild", IsSucceeded = false };
 
                 }
 

@@ -1,4 +1,5 @@
 ﻿using Domain.DTO;
+using Domain.Models;
 using Domain.ReturnsModels;
 
 namespace ClientWA.Services.Interfaces
@@ -7,6 +8,6 @@ namespace ClientWA.Services.Interfaces
     {
         Task<ServiceReturnModel<string>> refresh();
         Task<ServiceReturnModel<string>> Auth(AuthDto auth);
-
+        Task<ServiceReturnModel<string>> Logout();
     }
 }

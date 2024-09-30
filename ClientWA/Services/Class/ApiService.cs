@@ -19,8 +19,24 @@ namespace ClientWA.Services.Class
             _httpClientFactory = httpClientFactory;
             _localStorage = localStorage;
         }
-        public async Task<ServiceReturnModel<string>> refresh()
+        public async Task<ServiceReturnModel<string>> Logout()
         {
+            var client = _httpClientFactory.CreateClient("Server");
+            var response = await client.GetAsync("Authenticator/RemoveToken");
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                await _localStorage.RemoveItemsAsync(["jwt", "ExpiresTime", "data"]);
+
+                return new ServiceReturnModel<string>() { Comment = "Token Removed", IsSucceeded = true };
+            }
+            else
+            {
+                return new ServiceReturnModel<string>() { Comment = await response.Content.ReadAsStringAsync(), IsSucceeded = true };
+
+            }
+        }
+        public async Task<ServiceReturnModel<string>> refresh()
+             {
             var client = _httpClientFactory.CreateClient("Server");
             var  response =  await client.GetAsync("Authenticator/RefreshToken");
             if(response.StatusCode ==System.Net.HttpStatusCode.OK)

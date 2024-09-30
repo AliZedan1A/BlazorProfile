@@ -1,51 +1,69 @@
 ﻿@page "/login"
 @inject IApiService _apiservice
 @inject NavigationManager nav
+@inject Auth auth
 
-<AuthValidation Redirect="/" AuthV=false>
 
-</AuthValidation>
-<h3>Admin Login</h3>
+@if (IsActice==false)
+{
+    <h3>Admin Login</h3>
 
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <div class="loginform" id="account">
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-floating m-lg-3">
-                    <input @bind="UsernameInput" class="form-control" autocomplete="username" aria-required="true" />
-                    <label class="form-label">username</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating m-lg-3">
-                    <input @bind="PasswordInput" asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
-                    <label asp-for="Input.Password" class="form-label">password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <label style="color:@TextColor ;visibility:@visibility">@Text</label>
+    <div class="row">
+        <div class="col-md-4">
+            <section>
+                <div class="loginform" id="account">
+                    <hr />
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-floating m-lg-3">
+                        <input @bind="UsernameInput" class="form-control" autocomplete="username" aria-required="true" />
+                        <label class="form-label">username</label>
+                        <span asp-validation-for="Input.Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating m-lg-3">
+                        <input @bind="PasswordInput" asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                        <label asp-for="Input.Password" class="form-label">password</label>
+                        <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    </div>
+                    <label style="color:@TextColor ;visibility:@visibility">@Text</label>
 
-                <div>
-                    <button id="login-submit" @onclick="loginauth" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    <div>
+                        <button id="login-submit" @onclick="loginauth" type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                    </div>
+                    <div>
+                        <button id="login-submit" @onclick="test" type="submit" class="w-100 btn btn-lg btn-primary">Test</button>
+                    </div>
                 </div>
-                <div>
-                    <button id="login-submit" @onclick="test" type="submit" class="w-100 btn btn-lg btn-primary">Test</button>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
+
     </div>
+}else if(IsActice ==null)
+{
+    <h1>Loding...</h1>
+}
+else
+{
+    nav.NavigateTo("/", true);
+}
 
-</div>
 
 @code {
     private string UsernameInput;
     private string PasswordInput;
 
+    private bool? IsActice = null;
+
     //lable
     private string visibility = "hidden";
     private string Text = string.Empty;
     private string TextColor = "white";
-
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.Delay(500);
+        var status =  await auth.GetAuthenticationAsync();
+        if (status.IsSucceeded) IsActice = true;
+        else IsActice = false;
+    }
     private async void loginauth(MouseEventArgs e)
     {
         if (!string.IsNullOrEmpty(UsernameInput) && !string.IsNullOrEmpty(PasswordInput))
@@ -56,11 +74,9 @@
             var response = await _apiservice.Auth(new Domain.DTO.AuthDto() { Username = UsernameInput, Password = PasswordInput });
             if (response.IsSucceeded)
             {
-                visibility = "visible";
-                Text = "تم تسجيل الدخول بنجاح";
-                TextColor = "green";
+      
+                IsActice = true;
                 StateHasChanged();
-                nav.Refresh();
 
             }
             else
